@@ -62,25 +62,43 @@ export default function Gsap()
       //ease: "back.inOut"
     //})
 
-    gsap.to(".stagger-box", {
-      y: 250,
-      rotation: 360,
-      borderRadius: "100%",
-      repeat: -1,
-      yoyo: true,
-      // stagger 
-      stagger: {
-        amount: 1.5,
-        grid: [2 ,1],
-        axis: "y",
-        ease: "circ.inOut",
-        from: "center"
-      }
-    })
+   // gsap.to(".stagger-box", {
+     // y: 250,
+     // rotation: 360,
+     // borderRadius: "100%",
+     // repeat: -1,
+     // yoyo: true,
+     // // stagger 
+      //stagger: {
+       // amount: 1.5,
+       // grid: [2 ,1],
+       // axis: "y",
+       // ease: "circ.inOut",
+       // from: "center"
+     // }
+   // })
+      
+      gsap.to("#text" , {
+        ease: "power1.inOut",
+        opacity: 1,
+        x: -40 ,
+        y: 0,
+      })
+
+      gsap.fromTo(".para" , {
+        opacity: 0,
+        y: 20
+      }, {
+        opacity: 1,
+        y: 0,
+        delay: 1,
+        stagger:0.1
+      })
+
    } ,[])
 
     return(
-        <div className="flex justify-center items-center flex-col gap-9 p-8">
+        <div className="flex justify-center items-center flex-col gap-10 p-8">
            <button onClick={() => {
              //if(timeline.paused()) {
              // timeline.play();
@@ -97,6 +115,10 @@ export default function Gsap()
             {array.map((_, index) => (
               <div ref={groubBoxRef} key={index} className="w-[80px] h-[110px] bg-purple-400 stagger-box"></div>
             ))}
+           </div>
+           <div className="flex flex-col items-start justify-center gap-4">
+            <h1 id="text" className="text-black text-[20px]">Gsap For Text</h1>
+            <p className="para text-gray-500 text-[15px]">The fromTo() method is used to animate a single element from a starting state to an ending state and vice versa</p>
            </div>
         </div>
     )
