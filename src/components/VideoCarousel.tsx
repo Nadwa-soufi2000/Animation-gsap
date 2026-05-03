@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { hightlightsSlides } from "../constants";
+import { pauseImg, playImg, replayImg } from "../utils";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 export default function VideoCarousel() 
 {
@@ -14,8 +17,24 @@ export default function VideoCarousel()
         isLastVideo: false,
         isPlaying: false
     })
-    const[loadedData , setLoadedData] = useState([]);
+    const[loadedData , setLoadedData] = useState<Event[]>([]);
     const { isEnd , isLastVideo , startPlay , videoId , isPlaying } = video;
+
+    useGSAP(() => {
+      gsap.to('#video' , {
+        scrollTrigger: {
+          trigger: "#video" ,
+          toggleActions: 'restart none none none'
+        },
+        onComplete: () => {
+          setVideo((pre) => ({
+            ...pre ,
+            startPlay: true,
+            isPlaying: true
+          }))
+        }
+      })
+    }, [isEnd , videoId])
     
     useEffect(() => {
       if(loadedData.length > 3) {
@@ -27,6 +46,8 @@ export default function VideoCarousel()
         }
       }
     }, [startPlay , videoId , isPlaying , loadedData])
+
+    const handleLoadedMetadata = (i: number, e: Event) => setLoadedData((pre) => [...pre , e])
 
     useEffect(() => {
       const currentProgress = 0;
@@ -46,12 +67,34 @@ export default function VideoCarousel()
       }
     }, [])
 
+    const handleProcess = (type: string, i?: number) => 
+    {
+        switch(type) {
+          case 'video-end' : 
+           setVideo((pre) => ({...pre, End: true,
+           videoId: i + 1 }))
+           break;
+          case 'video-last' :
+            setVideo((pre) => ({...pre, isLastVideo: true }))
+            break;
+          case 'video-reset' : 
+            setVideo((pre) => ({...pre, isLastVideo: false,
+              videoId: 0 }))
+              break;
+          case 'play' : 
+            setVideo((pre) => ({...pre, isPlaying: !pre.isPlaying }))
+              break;
+          default:
+            return video;
+        }
+    }
+
     return(
         <>
           <div className="flex items-center">
             {hightlightsSlides.map((slide , i) => (
               <div key={slide.id} id="slider" className="sm:pr-20 pr-10">
-                <div className="">
+                <div className="relative">
                    <div className="w-full h-full flex items-center justify-center rounded-3xl overflow-hidden bg-black">
                      <video
                       id="video"
@@ -64,14 +107,17 @@ export default function VideoCarousel()
                             ...prevVideo, isPlaying: true
                         }))
                       }}
+                      onLoadedMetadata={(e) => 
+                        handleLoadedMetadata(i , e)
+                      }
                      >
                         <source src={slide.video} type="video/mp4"/>
                      </video>
                    </div>
 
-                   <div className="absolute top-12 left-[5%] z-10">
+                   <div className="absolute top-5 left-[10%] z-10">
                     {slide.textLists.map((text) => (
-                        <p key={text} className="md:text-2xl text-xl font-medium">{text}</p>
+                        <p key={text} className="md:text-xl text-lg font-medium text-white">{text}</p>
                     ))}
                    </div>
                 </div>
@@ -79,8 +125,8 @@ export default function VideoCarousel()
             ))}
           </div>
 
-          <div className="relative flex items-center justify-center mt-10">
-            <div className="flex justify-center items-center py-5 px-7 bg-gray-300 backdrop-blur rounded-full">
+          <div className="relative flex items-center justify-center gap-4 mt-10">
+            <div className="flex justify-center items-center py-5 px-7 bg-gray-500 backdrop-blur rounded-full">
                 {VideoRef.current.map((_,i) => (
                     <div 
                       key={i} 
@@ -88,7 +134,7 @@ export default function VideoCarousel()
                       className="mx-2 w-3 h-3 bg-gray-200 rounded-full relative cursor-pointer"
                      >
                       <span 
-                       className="absolute h-full w-full rounded-full"
+                       className="absolute h-full w-full bg-gray-400 rounded-full"
                        ref={(el) => { VideoSpanref.current[i] = el! }}
                       >
 
@@ -96,6 +142,21 @@ export default function VideoCarousel()
                      </div>
                 ))}
             </div>
+
+            <button className="rounded-full w-[50px] h-[50px] bg-gray-500 flex justify-center items-center">
+              <img 
+                src={isLastVideo ? replayImg :
+                  !isPlaying ? playImg : pauseImg}
+                alt={isLastVideo ? "replay" :
+                  !isPlaying ? 'play' : 'pause'}
+                onClick={isLastVideo
+                  ? () => handleProcess('video-reset')
+                  : !isPlaying
+                  ? () => handleProcess('play')
+                  : () => handleProcess('pause')
+                }
+              />
+            </button>
           </div>
         </>
     )
