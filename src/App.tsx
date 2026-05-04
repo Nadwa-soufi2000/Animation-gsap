@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar"
 function App() {
 
   return (
-    <div className="bg-black w-full">
+    <div className="bg-[#0b0b0b] w-full">
       <Navbar />
       <Hero />
       <Highlights />

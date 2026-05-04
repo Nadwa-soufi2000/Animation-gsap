@@ -91,13 +91,14 @@ export default function VideoCarousel()
 
     return(
         <>
-          <div className="flex items-center">
+          <div className="flex items-center justify-start w-[70%] mx-auto h-[700px] overflow-x-auto">
             {hightlightsSlides.map((slide , i) => (
-              <div key={slide.id} id="slider" className="sm:pr-20 pr-10">
-                <div className="relative">
-                   <div className="w-full h-full flex items-center justify-center rounded-3xl overflow-hidden bg-black">
+              <div key={slide.id} id="slider" className="sm:pr-20 pr-10 w-[90%] h-[100%]">
+                <div className="relative w-full h-full">
+                   <div className="w-[800px] h-full bg-[#000000] flex items-center justify-center rounded-3xl overflow-hidden bg-black">
                      <video
                       id="video"
+                      className="w-full object-cover"
                       playsInline={true}
                       preload="auto"
                       muted
@@ -137,7 +138,6 @@ export default function VideoCarousel()
                        className="absolute h-full w-full bg-gray-400 rounded-full"
                        ref={(el) => { VideoSpanref.current[i] = el! }}
                       >
-
                       </span>
                      </div>
                 ))}
